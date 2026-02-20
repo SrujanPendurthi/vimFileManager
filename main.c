@@ -5,38 +5,40 @@
 #include <string.h>
 #include <sys/stat.h>
 
-double findDataSize(struct stat st)
+void findDataSize(struct stat st)
 {
   double bytes = (double)st.st_size;
-
-  //float dataSize = stat st;
-  //make everything in GB, MB, KB, etc.
-  //count the number of digits you chop off 
-  //before you hit three sig figs
-  //(might be a more data driven way to do this)
-  return bytes;
+  const char *dataUnits[5] = {"B","KB","MB","GB","TB"};
+  
+  int sizeIndex=0;
+  while (bytes > 1024 && sizeIndex < 4)
+  {
+    bytes /= 1024;
+    ++sizeIndex;
+  }
+  printf("%.2f %s", bytes,dataUnits[sizeIndex]);
 }
 
-void filterDotFile(struct dirent *entry) // Added struct keyword for clarity
+void filterDotFile(struct dirent *entry) 
 {
   if(entry->d_name[0] != '.')
   {
     struct stat st;
-        // We need to call stat to get the actual file information
     if (stat(entry->d_name, &st) == -1) 
     {
       printf("%s [Error getting stats]\n", entry->d_name);
       return;
     }
 
-    if (S_ISDIR(st.st_mode)) // More portable way to check for Directory
+    if (S_ISDIR(st.st_mode))
     {
       printf("%-20s [DIR]\n", entry->d_name); 
     }
     else 
     {
-      printf("%-20s [FILE] %ld bytes\n", entry->d_name, (long)st.st_size);
-      printf("%f",findDataSize(st));
+      printf("%-20s [FILE]", entry->d_name);
+      findDataSize(st);
+      printf("\n");
     }
   }
 }
