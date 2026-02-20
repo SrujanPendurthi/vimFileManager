@@ -5,14 +5,16 @@
 #include <string.h>
 #include <sys/stat.h>
 
-float findDataSize(struct stat st)
+double findDataSize(struct stat st)
 {
-  float dataSize;
+  double bytes = (double)st.st_size;
+
+  //float dataSize = stat st;
   //make everything in GB, MB, KB, etc.
   //count the number of digits you chop off 
   //before you hit three sig figs
   //(might be a more data driven way to do this)
-  return dataSize; 
+  return bytes;
 }
 
 void filterDotFile(struct dirent *entry) // Added struct keyword for clarity
@@ -34,6 +36,7 @@ void filterDotFile(struct dirent *entry) // Added struct keyword for clarity
     else 
     {
       printf("%-20s [FILE] %ld bytes\n", entry->d_name, (long)st.st_size);
+      printf("%f",findDataSize(st));
     }
   }
 }
